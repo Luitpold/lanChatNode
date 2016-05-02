@@ -1,0 +1,38 @@
+<% include ../partials/header.ejs %>
+<script type="text/javascript">
+  var url = window.location.href;
+  var socket = io.connect(url);
+  socket.on("welcome", function(message){
+    console.log("Date of Server "+message.date);
+  });
+  $(document).ready(function(){
+    socket.on("newMessage",function(message){
+      $("#chatlist").append(
+        $("<li></li>").text(message.username+":").append(
+          $("<span></span>").attr('style','color:red').text(message.message)
+        )
+      );
+    });
+    $("#submit").click(function(){
+      var username = $("#username").val();
+      var message = $("#message").val();
+      $("#chatlist").append(
+        $("<li></li>").text(username+" : "+message)
+      );
+      socket.emit("message",{
+        username : username,
+        message : message
+      });
+    });
+  });//End of document ready
+</script>
+<h1><%=title%></h1>
+<div class="container">
+  <div class="chat" style="overflow-y:scroll; height:400px; width:auto;" >
+    <ul id=chatlist style="list-style-type: none;"></ul>
+  </div>
+  <label for="">Benutzername:</label><input type="text" id="username" name="name" value=""/><br>
+  <label for="">Nachricht:</label><input type="text" id="message" name="name" value=""/><br>
+  <button id="submit" class="btn btn-primary" type="button" name="button">Abesenden!</button>
+</div>
+<% include ../partials/footer.ejs %>
